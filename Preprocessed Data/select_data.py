@@ -39,21 +39,46 @@ def crop_production(EU, protein_crops):
     None.
     """
     se = os.sep
-    filepath = ".." + se + ".." + se + "Data" + se + "Production_Crops_E_All_Data" + se + "Production_Crops_E_All_Data_NOFLAG.csv"
-    
-    protein_df = pd.read_csv(filepath,  sep=",", encoding="latin-1")
+    filepath = ".." + se + ".." + se + "Data" + se + "Production_Crops_E_All_Data" + se + "Production_Crops_E_All_Data_NOFLAG.csv"    
+    protein_prod_df = pd.read_csv(filepath,  sep=",", encoding="latin-1")
     # Only consider the relevant years
-    protein_df = protein_df[['Area Code', 'Area', 'Item Code', 'Item', 
-                             'Element Code', 'Element', 'Unit', "Y2005", "Y2017"]]
+    protein_prod_df = protein_prod_df[['Area', 'Item', 'Element', 'Unit', "Y2005", "Y2017"]]
     # Select only EU countries
-    protein_df = protein_df.loc[protein_df["Area"].isin(EU),:]
+    protein_prod_df = protein_prod_df.loc[protein_prod_df["Area"].isin(EU),:]
     # Only consider production amonut
-    protein_df = protein_df.loc[protein_df["Element"] == "Production",:]
+    protein_prod_df = protein_prod_df.loc[protein_prod_df["Element"] == "Production",:]
     # Only consider protein crops
-    protein_df = protein_df.loc[protein_df["Item"].isin(protein_crops),:]
-    protein_df.to_csv("european_protein_crops.csv")
+    protein_prod_df = protein_prod_df.loc[protein_prod_df["Item"].isin(protein_crops),:]
+    protein_prod_df.to_csv("european_protein_crops_production.csv")
+    return protein_prod_df
+    
+    
+def trade(EU, protein_crops):
+    """
+    Reads, sorts and saves the worldwide trade for the protein crops
+
+    Returns
+    -------
+    None.
+    """
+    se = os.sep
+    filepath = ".." + se + ".." + se + "Data" + se + "Trade_DetailedTradeMatrix_E_All_Data" + se + "Trade_DetailedTradeMatrix_E_All_Data_NOFLAG.csv"    
+    protein_trade_df = pd.read_csv(filepath,  sep=",", encoding="latin-1")
+    # Only consider the relevant years
+    protein_trade_df = protein_trade_df[["Reporter Countries", "Partner Countries",
+                                       "Item", "Element", "Unit", "Y2005", "Y2017"]]
+    # Only consider imports
+    protein_trade_df = protein_trade_df.loc[protein_trade_df["Element"] == "Import Quantity"]
+    # Only consider EU countries
+    protein_trade_df = protein_trade_df.loc[protein_trade_df["Reporter Countries"].isin(EU),:]
+    # Only consider protein_crops
+    protein_trade_df = protein_trade_df.loc[protein_trade_df["Item"].isin(protein_crops),:]
+    protein_trade_df.to_csv("european_protein_crops_imports")
+    return protein_trade_df
 
 
-protein_df = crop_production(EU, protein_crops)
+protein_prod_df =  crop_production(EU, protein_crops)
+protein_trade_df = trade(EU, protein_crops)
+
 
 
